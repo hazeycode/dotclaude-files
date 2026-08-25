@@ -136,7 +136,11 @@ Checks are cheap; churn is not — mistakes, not verification, are the token cos
 
 - **Grep first, then read the part you need** — reads dominate context cost,
   and a big early read is re-paid every turn after.
-- **Absolute paths; no `cd`** — compound `cd … && …` is the largest single
-  source of tool errors in sandboxed worktrees.
+- **Never `cd`; work from your persistent cwd** — compound `cd … && …` is the
+  largest single source of tool errors in sandboxed worktrees (and triggers
+  permission prompts). The Bash cwd persists across calls, and a lane starts
+  inside its own worktree, so relative paths from cwd just work — no need for
+  absolute-path friction. Absolute paths only when reaching another tree
+  (the coordinator across worktrees; `git -C <path>`).
 - **Condense before final commit, without information loss** — responses,
   code, comments, docs, memories; clean stale things as you go.

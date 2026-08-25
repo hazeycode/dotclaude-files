@@ -10,8 +10,9 @@ beyond it. On arrival VERIFY isolation: cwd inside a worktree, branch not the
 target branch — if unisolated, STOP and report; never hand-build a worktree,
 your permissions and sandbox assume the coordinator-provided one.
 Commit only to your own branch (check `git branch --show-current` first),
-early and often, with a running state-of-play before long operations. Absolute
-paths, no `cd`; grep first, then read the part you need. Bound every retry and
+early and often, with a running state-of-play before long operations. You
+start inside your worktree, so work from it with relative paths; never `cd`.
+Grep first, then read the part you need. Bound every retry and
 wait — never poll for what may not arrive. Report exit codes you actually saw,
 changes with proofs, simplification candidates seen but not performed, and
 negative results plainly.

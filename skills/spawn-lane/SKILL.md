@@ -32,7 +32,8 @@ wrong answers.
 
 - **Identity and rules**: it is worktree-isolated already; no worktree
   commands, no sub-agents; commits only to its own branch (check
-  `git branch --show-current` first); absolute paths, no `cd`; grep-then-read.
+  `git branch --show-current` first); it starts inside its worktree — relative
+  paths from cwd, never `cd`; grep-then-read.
 - **Established findings** as facts with numbers — never "read the plan".
   Extend plans, don't send lanes to re-derive them.
 - **Region ownership**: the files/regions other live lanes own; the lane stops

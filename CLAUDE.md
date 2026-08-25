@@ -19,9 +19,10 @@ need editing when a project changes.
   resources (GPU, benchmarks) get one lane at a time, or a lock. **Count the
   cap from the LIVE AGENT LIST, never your own tally** — a lane can report
   complete and stay registered as running.
-- **A lane is spawned isolated and VERIFIES it on arrival** (cwd inside a
-  worktree, branch not main); if unisolated it hand-builds a worktree and works
-  by absolute path — never via worktree commands that assume a free cwd.
+- **The coordinator provides the worktree; the lane VERIFIES it on arrival**
+  (cwd inside a worktree, branch not the target) — spawn type `lane` makes the
+  harness create it. An unisolated lane STOPS and reports; it never
+  hand-builds, and never runs worktree commands that assume a free cwd.
 - **Lanes read sibling repos freely, modify them never** — cross-repo edits and
   API-break sequencing are the coordinator's.
 - **Dead lanes respawn fresh from a checkpoint; idle lanes get a nudge;
@@ -56,6 +57,8 @@ need editing when a project changes.
   interpretation sentence.
 
 ## Verification discipline
+
+Checks are cheap; churn is not — mistakes, not verification, are the token cost.
 
 - **Run the check on the tree YOU built**; never quote a literal from a plan,
   doc-comment, or brief when the artifact itself can be read.

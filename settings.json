@@ -1,5 +1,29 @@
 {
   "model": "claude-fable-5[1m]",
+  "permissions": {
+    "allow": [
+      "Bash(git status*)",
+      "Bash(git log*)",
+      "Bash(git diff*)",
+      "Bash(git show*)",
+      "Bash(git rev-parse*)",
+      "Bash(git merge-base*)",
+      "Bash(git branch --show-current)",
+      "Bash(git worktree list)",
+      "Bash(git ls-files*)",
+      "Bash(git grep*)",
+      "Bash(git blame*)"
+    ],
+    "deny": [
+      "Bash(git push*)",
+      "Bash(git stash)",
+      "Bash(git stash pop*)"
+    ]
+  },
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true
+  },
   "hooks": {
     "PreToolUse": [
       {

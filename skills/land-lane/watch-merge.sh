@@ -9,15 +9,17 @@
 # Stateless on purpose: ancestry, not a captured baseline, decides - so a
 # commit that lands before the watch even starts is still ACCEPTED.
 # The verdict is a trigger, not proof - land-lane step 9 re-verifies.
+# --end-of-options guards every ref operand so a branch named like a flag
+# (e.g. "--all") is read as a ref, never executed as an option.
 
 repo=$1; lane=$2; target=${3:-main}; cap=${4:-3600}
-lane_head=$(git -C "$repo" rev-parse "$lane") || exit 2
-git -C "$repo" rev-parse -q --verify "$target" >/dev/null || exit 2
+lane_head=$(git -C "$repo" rev-parse --verify --end-of-options "$lane") || exit 2
+git -C "$repo" rev-parse -q --verify --end-of-options "$target" >/dev/null || exit 2
 elapsed=0
 while [ "$elapsed" -lt "$cap" ]; do
   if ! git -C "$repo" rev-parse -q --verify MERGE_HEAD >/dev/null; then
-    if git -C "$repo" merge-base --is-ancestor "$lane_head" "$target"; then
-      echo "ACCEPTED $(git -C "$repo" rev-parse "$target")"
+    if git -C "$repo" merge-base --is-ancestor --end-of-options "$lane_head" "$target"; then
+      echo "ACCEPTED $(git -C "$repo" rev-parse --verify --end-of-options "$target")"
     else
       echo "REJECTED"
     fi

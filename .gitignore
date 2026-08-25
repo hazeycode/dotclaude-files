@@ -1,0 +1,11 @@
+# Machine-local overrides and secrets — never commit to this public repo.
+settings.local.json
+*.local.json
+.credentials.json
+.env
+*.pem
+*.key
+id_rsa*
+
+# OS / editor cruft
+.DS_Store

@@ -1,0 +1,51 @@
+{
+  "folders": [
+    { "name": "{{LANE}} — staged merge under review", "path": "{{REPO}}" }
+  ],
+  "settings": {
+    "terminal.integrated.cwd": "{{REPO}}",
+    "workbench.startupEditor": "none"
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "review terminal",
+        "type": "shell",
+        "command": "${env:SHELL}",
+        "options": { "cwd": "{{REPO}}" },
+        "isBackground": true,
+        "presentation": { "reveal": "always", "focus": false, "panel": "dedicated" },
+        "runOptions": { "runOn": "folderOpen" },
+        "problemMatcher": []
+      },
+      {
+        "label": "git warmup",
+        "type": "shell",
+        "command": "sleep 4",
+        "detail": "The sleep gives git repo discovery time to finish before the command-variables in the view tasks fire. Do not remove.",
+        "presentation": { "reveal": "never", "close": true },
+        "problemMatcher": []
+      },
+      {
+        "label": "open staged diffs",
+        "type": "shell",
+        "command": "echo staged diffs ${command:git.viewStagedChanges}",
+        "detail": "One command-variable per task: a command returning undefined cancels the task's remaining variable resolution, so bundling both views in one task opens only the first.",
+        "dependsOn": ["git warmup"],
+        "presentation": { "reveal": "never", "close": true },
+        "runOptions": { "runOn": "folderOpen" },
+        "problemMatcher": []
+      },
+      {
+        "label": "open commit graph",
+        "type": "shell",
+        "command": "echo commit graph ${command:git-graph.view}",
+        "dependsOn": ["git warmup"],
+        "presentation": { "reveal": "never", "close": true },
+        "runOptions": { "runOn": "folderOpen" },
+        "problemMatcher": []
+      }
+    ]
+  }
+}

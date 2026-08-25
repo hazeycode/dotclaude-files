@@ -1,0 +1,23 @@
+{
+  "model": "claude-fable-5[1m]",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Agent|Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/enforce-lane-tier.sh",
+            "timeout": 10,
+            "statusMessage": "Checking lane tier declaration"
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+  },
+  "skipWorkflowUsageWarning": true,
+  "theme": "dark",
+  "agentPushNotifEnabled": true
+}

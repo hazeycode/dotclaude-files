@@ -6,7 +6,7 @@
 # missing jq or an unparseable payload denies rather than allows.
 # Residual gap (accepted): a lane spawned with NO isolation parameter that
 # hand-builds its own worktree is not detectable here.
-# Registration ships in the repo-root settings.json (installed to
+# Registration ships in templates/settings.json (installed to
 # ~/.claude/settings.json). After provisioning a new machine, watch this hook
 # go RED on purpose — spawn a violating lane and see the deny — before
 # trusting it: a missing deny is indistinguishable from compliance.

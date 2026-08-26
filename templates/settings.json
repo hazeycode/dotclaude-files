@@ -1,5 +1,4 @@
 {
-  "model": "claude-fable-5[1m]",
   "permissions": {
     "allow": [
       "Bash(git status*)",
@@ -22,7 +21,14 @@
   },
   "sandbox": {
     "enabled": true,
-    "autoAllowBashIfSandboxed": true
+    "autoAllowBashIfSandboxed": true,
+    "filesystem": {
+      "allowWrite": [
+      ],
+      "allowRead": [
+        "~/.claude"
+      ]
+    }
   },
   "hooks": {
     "PreToolUse": [

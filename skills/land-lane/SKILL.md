@@ -83,7 +83,11 @@ is NOT a self-lane: it reaches the human inside that lane's staged merge.
      vendored `land-review.code-workspace.template` into a UNIQUELY-NAMED
      `land-review-<lane>.code-workspace` (an already-open workspace focuses
      without re-firing folderOpen tasks — re-present = fresh name), then
-     `code -n <file>`: a workspace's own window identity opens a NEW window
+     `bash ~/.claude/skills/land-lane/open-review.sh <file>` WITH
+     `dangerouslyDisableSandbox` — the only such call in this workflow, and the
+     one command `refuse-sandbox-override.sh` allows by name. A sandboxed child
+     cannot reach launchd, so plain `code -n` exits 0 and opens nothing. The
+     wrapper opens a workspace, whose own window identity gives a NEW window
      even when the folder is open elsewhere (`code -n <folder>` silently
      no-ops there). ONLY the primary checkout goes in the window — the lane
      worktree as folder or terminal cwd biases active-repo resolution and

@@ -7,8 +7,14 @@
 # whole filesystem and network boundary undone by a request nobody saw. This
 # hook takes the decision away from the model.
 #
-# NOTHING PROJECT-SPECIFIC LIVES HERE. Two lists, both optional, both one shell
-# glob per line with `#` comments and blank lines ignored:
+# ONE WORKFLOW CONSTANT, then nothing project-specific. The constant is the
+# land-lane review window (see open_review_wrapper below): it is part of this
+# repo, not of any project, so no per-project list could carry it without every
+# project copying the same line. It is deliberately the only one -- a second
+# entry here means the rule stopped being about this workflow.
+#
+# Beyond it, two lists, both optional, both one shell glob per line with `#`
+# comments and blank lines ignored:
 #
 #   <project>/.claude/sandbox-exempt         TRACKED. What the project needs to
 #                                            run its own gates. Ships with the
@@ -71,6 +77,20 @@ case $cmd in
   *';'*|*'&&'*|*'||'*|*'|'*|*'`'*|*'$('*|*$'\n'*)
     deny "sandbox override refused; an exemption covers a single unchained command only" ;;
 esac
+
+# The one workflow constant, ahead of both lists: land-lane's review window.
+# Named as the WRAPPER, never as `code` -- the wrapper takes exactly one
+# argument and refuses anything that is not an existing *.code-workspace file,
+# so the open tail here cannot become a VS Code flag. See open-review.sh for
+# why exempting `code` directly would be a hole. Both spellings of the path are
+# listed because a hook sees the command as the caller typed it.
+open_review_wrapper=no
+case $cmd in
+  'bash ~/.claude/skills/land-lane/open-review.sh '*|\
+  "bash $HOME/.claude/skills/land-lane/open-review.sh "*)
+    open_review_wrapper=yes ;;
+esac
+[ "$open_review_wrapper" = yes ] && exit 0
 
 dir=$(jq -r '.cwd // empty' <<<"$input" 2>/dev/null)
 [ -n "$dir" ] || dir=$CLAUDE_PROJECT_DIR

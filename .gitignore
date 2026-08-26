@@ -9,5 +9,10 @@ settings.local.json
 *.key
 id_rsa*
 
+# Review windows land-lane instantiates from its template, one per landing.
+# Untracked debris here fails the step-7 clean-checkout precheck on the NEXT
+# landing, so it is ignored rather than merely deleted at cleanup.
+land-review-*.code-workspace
+
 # OS / editor cruft
 .DS_Store

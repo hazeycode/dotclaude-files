@@ -7,10 +7,11 @@ what is already there**:
 cp -R CLAUDE.md skills hooks templates agents ~/.claude/ && chmod +x ~/.claude/hooks/*.sh
 ```
 
-Your `~/.claude/settings.json` is untouched, and hooks do not run until they
-are registered there, so merge `templates/settings.json` into it by hand —
-starting with the `hooks` block. Read **Sandbox policy** before taking the
-`sandbox` block: it denies more than you expect.
+Your `~/.claude/settings.json` is untouched, and nothing here takes effect
+until you merge `templates/settings.json` into it by hand. **Read
+[Sandbox policy](#sandbox-policy) first** — it lists the four blocks you need
+and what each one covers. Taking some of them is not a partial policy; the
+blocks cover different halves of the surface.
 
 Starting fresh?
 `cp templates/settings.json ~/.claude/settings.json`.
@@ -48,9 +49,26 @@ classifier is consulted.
 
 ### Sandbox policy
 
-`templates/settings.json` denies reads across your home directory and the
-sensitive system paths — read the file for the lists. Two things it does not
-tell you:
+**Four separate blocks in `templates/settings.json` wire this up, and it is
+only as strong as the weakest one you skip:**
+
+| Block | Covers |
+|---|---|
+| `sandbox.filesystem` — `denyRead`/`allowRead` | bash and every process it spawns |
+| `permissions.deny` — `Read(…)`/`Edit(…)` rules | the file tools, which the sandbox does **not** reach |
+| `sandbox.autoAllowBashIfSandboxed: false` | the keystone; while `true` nothing prompts at all |
+| the three `hooks.PreToolUse` entries | lane tier, shell substitution, sandbox override |
+
+Sandboxing "applies only to Bash commands and their child processes", so Read
+and Write bypass `denyRead` completely — the `permissions.deny` rules are the
+only thing that stops them, and no scope can lift a deny. Take the `sandbox`
+block without the `deny` list and the file tools still read your keys.
+
+`hooks/refuse-sandbox-override.sh` refuses any Bash call carrying
+`dangerouslyDisableSandbox`, so leaving the boundary takes a human editing
+settings rather than the model asking.
+
+Read the file for the path lists. Two things it does not tell you:
 
 Every project is unreadable until it grants itself, in one untracked line:
 

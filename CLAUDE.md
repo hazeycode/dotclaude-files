@@ -139,6 +139,13 @@ Checks are cheap; churn is not — mistakes, not verification, are the token cos
   scope** — no config lifts it. Edit them with the file tools, which go through
   permissions instead; a git operation that rewrites those paths fails with
   `unable to unlink old`.
+- **State goes in `<project>/.claude/state/`, never `~/.claude`.** Task notes,
+  scratch and state-of-play belong to the project, which is writable. Keep the
+  path gitignored — an untracked file there fails land-lane's clean-checkout
+  precheck. `~/.claude` is READ-ONLY and only its installed artifacts
+  (`CLAUDE.md`, `skills/`, `agents/`, `hooks/`, `settings.json`) are readable
+  at all; everything else there, including transcripts and credentials, is
+  denied.
 
 ## Git in a multi-lane world
 

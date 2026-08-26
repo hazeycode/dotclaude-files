@@ -14,6 +14,12 @@
       "Bash(git blame*)"
     ],
     "deny": [
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)",
+      "Read(~/.gnupg/**)",
+      "Read(~/.claude/.credentials.json)",
+      "Read(~/.claude/projects/**/*.jsonl)",
+      "Edit(~/.claude/**)",
       "Bash(git push*)",
       "Bash(git stash)",
       "Bash(git stash pop*)"
@@ -77,6 +83,17 @@
             "command": "~/.claude/hooks/guard-allowlisted-bash.sh",
             "timeout": 10,
             "statusMessage": "Guarding allowlisted bash"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/refuse-sandbox-override.sh",
+            "timeout": 10,
+            "statusMessage": "Refusing sandbox override"
           }
         ]
       }

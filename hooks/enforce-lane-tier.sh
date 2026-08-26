@@ -1,15 +1,17 @@
 #!/bin/bash
-# PreToolUse hook on the Agent tool.
-# Gates lane spawns (isolation "worktree" or "remote"): the model parameter
-# must be explicit and one of sonnet/opus/fable, and forks are refused (they
-# ignore the model parameter). Other spawns pass through. FAILS CLOSED: a
-# missing jq or an unparseable payload denies rather than allows.
-# Residual gap (accepted): a lane spawned with NO isolation parameter that
-# hand-builds its own worktree is not detectable here.
-# Registration ships in templates/settings.json (installed to
-# ~/.claude/settings.json). After provisioning a new machine, watch this hook
-# go RED on purpose — spawn a violating lane and see the deny — before
-# trusting it: a missing deny is indistinguishable from compliance.
+# PreToolUse(Agent): every lane spawn must name its model.
+#
+# Applies to spawns with isolation "worktree" or "remote". The model must be
+# given and must be sonnet, opus or fable. Forks are refused because they
+# ignore the model parameter. Other spawns pass through untouched.
+#
+# Fails closed: no jq, or a payload it cannot parse, denies rather than allows.
+#
+# Known gap: a lane spawned with no isolation parameter that builds its own
+# worktree is invisible here.
+#
+# On a new machine, watch it deny a violating spawn before trusting it. A hook
+# that never fires looks exactly like one that always passes.
 
 deny_raw() {
   printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"%s"}}' "$1"

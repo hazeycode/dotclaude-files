@@ -156,6 +156,9 @@ Checks are cheap; churn is not — mistakes, not verification, are the token cos
 - A lane commits ONLY to its own branch (check `git branch --show-current`
   before the first commit); never touch main from a lane; never push unasked.
 - Commit early, often, and before any `git checkout`.
+- **Keep commit messages short.** One line for most commits. Add a few lines of
+  body only for a large or surprising change. Never restate what the diff, the
+  README, or a committed doc already says — the reader has all three.
 
 ## Context economy
 

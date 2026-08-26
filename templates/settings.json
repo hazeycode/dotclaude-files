@@ -1,6 +1,8 @@
 {
   "permissions": {
     "allow": [
+      "TaskList",
+      "TaskGet",
       "Bash(git status*)",
       "Bash(git log*)",
       "Bash(git diff*)",
@@ -11,7 +13,15 @@
       "Bash(git worktree list)",
       "Bash(git ls-files*)",
       "Bash(git grep*)",
-      "Bash(git blame*)"
+      "Bash(git blame*)",
+      "Bash(grep*)",
+      "Bash(rg*)",
+      "Bash(head*)",
+      "Bash(tail*)",
+      "Bash(wc*)",
+      "Bash(cut*)",
+      "Bash(sort*)",
+      "Bash(uniq*)"
     ],
     "deny": [
       "Read(~/.ssh/**)",
@@ -94,6 +104,17 @@
             "command": "~/.claude/hooks/refuse-sandbox-override.sh",
             "timeout": 10,
             "statusMessage": "Refusing sandbox override"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|NotebookEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/guard-exemption-writes.sh",
+            "timeout": 10,
+            "statusMessage": "Guarding exemption files"
           }
         ]
       }

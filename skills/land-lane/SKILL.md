@@ -97,7 +97,9 @@ is NOT a self-lane: it reaches the human inside that lane's staged merge.
    Tell the human: branch, target, the lane's commits
    (`git log --oneline <target>..<lane>`), cumulative diffstat
    (`git diff --stat <target>...<lane>`), battery verdict with exit codes,
-   report digest. Then run the vendored
+   report digest, and any `sandbox-exempt` / `bash-expansion-exempt` line in
+   the diff quoted VERBATIM — an exemption is a permission grant and never
+   rides in as a diffstat number. Then run the vendored
    `watch-merge.sh <repo> <lane> <target>` in the background — BOUNDED (1 h default), PRINTS `ACCEPTED <sha>` / `REJECTED` /
    `TIMEOUT` the moment MERGE_HEAD resolves. ACCEPTED or REJECTED → step 9
    (the watch is a trigger, not proof). TIMEOUT → ask the human; never re-arm

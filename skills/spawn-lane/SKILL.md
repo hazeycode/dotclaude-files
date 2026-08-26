@@ -36,6 +36,9 @@ wrong answers.
   commands, no sub-agents; commits only to its own branch (check
   `git branch --show-current` first); it starts inside its worktree — relative
   paths from cwd, never `cd`; grep-then-read.
+- **Exemptions are requests, not edits**: a command the project's exemption
+  lists don't already cover goes in the report as glob + command + why nothing
+  weaker works. The lane never writes the line (`agents/lane.md` carries it).
 - **Established findings** as facts with numbers — never "read the plan".
   Extend plans, don't send lanes to re-derive them.
 - **Region ownership**: the files/regions other live lanes own; the lane stops

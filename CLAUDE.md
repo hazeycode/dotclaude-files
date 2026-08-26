@@ -129,6 +129,14 @@ Checks are cheap; churn is not — mistakes, not verification, are the token cos
   the sandbox to get past one — the only overrides are a deliberate test OF the
   sandbox, or an action outside the boundary the human explicitly asked for
   (installing to `~/.claude`).
+- **The exemption lists are read-only to you.** `.claude/sandbox-exempt`,
+  `.claude/bash-expansion-exempt` and their `.local` twins are the glossary of
+  what already runs unprompted — read them before shelling out (file tool, not
+  `cat`: a Bash mention prompts). They are honoured with no prompt at all, so
+  adding a line IS the grant: a gate needing `dangerouslyDisableSandbox` or a
+  command carrying `$( )` is a REQUEST — report the exact glob, the command,
+  and why nothing weaker works. Never write the line; never hunt a phrasing
+  that slips past a guard.
 - **Reads stop at the repo; writes stop at the repo and `$TMPDIR`.** A project
   becomes readable only through its OWN untracked
   `.claude/settings.local.json` — `{"sandbox":{"filesystem":{"allowRead":["."]}}}`.

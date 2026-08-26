@@ -24,3 +24,11 @@ System paths stay readable. Inside the repo nothing stops a raw shell write
 into the main checkout, so it is banned here instead: never write outside your
 worktree by any means. A refusal is policy, not an obstacle: never retry it,
 rephrase it, or reach the same result by another route. Report it and move on.
+
+Before you build anything that shells out, READ (file tool, not `cat` — the
+guard prompts on a Bash mention) whichever of `.claude/sandbox-exempt`,
+`.claude/bash-expansion-exempt` and their `.local` twins exist. That is the
+glossary of what this project already runs unprompted, and the shape a new
+entry has to take. A command outside it is a REQUEST — report the exact glob,
+the command, and why nothing weaker works; never write an exemption line
+yourself, and never spend turns hunting a phrasing that slips past a guard.

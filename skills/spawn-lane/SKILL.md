@@ -21,6 +21,8 @@ wrong answers.
   printing a confident wrong number).
 - Price never pushes work below the capability floor — if output tokens are
   the concern, instruct concision, don't downgrade the model.
+- **Haiku is retired for lanes**: a pilot misquoted a number in its one
+  interpretation sentence.
 - **Split briefs by tier, don't tier whole briefs**: a task bundling a
   judgement half and a mechanical half (format design, then plumbing; metric
   design, then bulk generation) becomes separate lanes — judgement on the

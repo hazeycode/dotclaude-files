@@ -21,10 +21,6 @@ need editing when a project changes.
   resources (GPU, benchmarks) get one lane at a time, or a lock. **Count the
   cap from the LIVE AGENT LIST, never your own tally** — a lane can report
   complete and stay registered as running.
-- **The coordinator provides the worktree; the lane VERIFIES it on arrival**
-  (cwd inside a worktree, branch not the target) — spawn type `lane` makes the
-  harness create it. An unisolated lane STOPS and reports; it never
-  hand-builds, and never runs worktree commands that assume a free cwd.
 - **Lanes read sibling repos freely, modify them never** — cross-repo edits and
   API-break sequencing are the coordinator's.
 - **Dead lanes respawn fresh from a checkpoint; idle lanes get a nudge;
@@ -43,34 +39,16 @@ need editing when a project changes.
   One cost three hours of a slot, caught only because the live list disagreed
   with the tally.
 - **Briefs carry established findings** — never send a lane to re-read a long
-  plan. Extend plans, don't multiply them. **And never restate what a
-  committed plan, report, or log already records** — in briefs, task
-  descriptions, and reports alike: cite the file (and section) plus only the
-  load-bearing numbers. The owning doc carries the substance, once.
-- **Lane reports are capped: verdicts, exit codes, hash/golden lines, and
-  pointers to committed evidence.** Full tables, derivations, and logs live in
-  files on the lane branch (state-of-play, plan sections, log files), read
-  optionally at skeptical-read time. A report that restates its own committed
-  files pays for the same tokens twice — at frontier output prices.
+  plan; extend plans, don't multiply them. **Never restate what a committed
+  plan, report, or log already records** — in briefs, task descriptions, and
+  reports alike: cite the file and section plus the load-bearing numbers. The
+  owning doc carries the substance once; restating it pays twice, at frontier
+  output prices.
 - **Ask vs decide:** the coordinator decides anything derivable from code,
   docs, or measurement; the human rules on goals, trade-offs, and anything
   moving a baseline. Rulings are short option quizzes with a recommendation,
   recorded in the owning doc as they land, never re-litigated — a recorded
   ruling is load-bearing until the human moves it.
-- **Gate scoping is the coordinator's job**: pick the lane's list from its diff
-  surface at brief time; the full suite runs once at land time (land-lane's
-  pre-review battery). Not every lane runs every gate.
-
-## Model selection for lanes
-
-- **Capability floor beats cost.** Never let price push work to a model
-  unlikely to perform it; if output tokens are expensive, instruct concision —
-  don't use a weaker model.
-- **Sonnet when the brief carries the judgement** (mechanical edits, applying a
-  decision, a specified sweep); **the frontier model when the lane decides what
-  "correct" means, could invalidate baselines, or the instrument can fail
-  silently.** Haiku is retired for lanes: a pilot misquoted a number in its one
-  interpretation sentence.
 
 ## Verification discipline
 
@@ -132,7 +110,9 @@ Checks are cheap; churn is not — mistakes, not verification, are the token cos
   simplification candidates it saw but did not perform. Never a licence to
   refactor past the brief.
 - **Keep shared context lean continuously** — compress in the same edit that
-  grows it. Every lane loads the project file in full every time.
+  grows it, without information loss, across responses, code, comments, docs,
+  and memories; clean stale things as you go. Every lane loads the project file
+  in full every time.
 - **Plans state current truth: DELETE superseded content, don't annotate it
   dead** — a staleness banner makes every reader parse both eras. Grep citing
   sites before cutting; append-only records (ledgers, signed entries) are
@@ -153,15 +133,12 @@ Checks are cheap; churn is not — mistakes, not verification, are the token cos
 - **Grep first, then read the part you need** — reads dominate context cost,
   and a big early read is re-paid every turn after.
 - **Never `cd`; work from your persistent cwd** — compound `cd … && …` is the
-  largest single source of tool errors in sandboxed worktrees (and triggers
-  permission prompts). The Bash cwd persists across calls, and a lane starts
-  inside its own worktree, so relative paths from cwd just work — no need for
-  absolute-path friction. Absolute paths only when reaching another tree
-  (the coordinator across worktrees; `git -C <path>`).
+  largest single source of tool errors in sandboxed worktrees, and triggers
+  permission prompts. The Bash cwd persists across calls and a lane starts in
+  its own worktree, so relative paths just work; absolute paths only to reach
+  another tree (`git -C <path>`).
 - **Batch background work** — every background completion replays the whole
   context as a fresh turn, so N small background tasks cost N replays. Run
   short probes foreground in one compound command (per-step exit codes
   captured); reserve background for genuinely long runs, grouped so
   completions cluster; never poll for what the harness will notify.
-- **Condense before final commit, without information loss** — responses,
-  code, comments, docs, memories; clean stale things as you go.

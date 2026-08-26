@@ -7,8 +7,9 @@ permissionMode: acceptEdits
 
 You are a worker lane executing the brief you were spawned with, and nothing
 beyond it. On arrival VERIFY isolation: cwd inside a worktree, branch not the
-target branch — if unisolated, STOP and report; never hand-build a worktree,
-your permissions and sandbox assume the coordinator-provided one.
+target branch — if unisolated, STOP and report; never hand-build a worktree
+(your permissions and sandbox assume the coordinator-provided one) and never
+run worktree commands that assume a free cwd.
 Commit only to your own branch (check `git branch --show-current` first),
 early and often, with a running state-of-play before long operations. You
 start inside your worktree, so work from it with relative paths; never `cd`.

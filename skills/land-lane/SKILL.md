@@ -10,24 +10,18 @@ lands through the human's review — no exceptions, docs-only included; a no-dif
 lane is a report, not a landing (step 2). The TARGET branch is main unless the
 human names another at land time. Commit scope: the coordinator may commit on
 LANE branches (update-merges, checkpoints); the landing merge on the TARGET is
-the human's, always. Review tool: `LANE_REVIEW` in the settings `env` block
-(read at session start) — unset/`vscode` runs step 8's recipe; `manual` skips
-the launch for the human's own tooling.
+the human's, always.
 
-**Changes the coordinator authored itself land the same way — as a SELF-LANE.**
-There is no second review path. Turn the primary checkout's edits into a branch
-first: `git checkout -b coord/<topic>` (uncommitted edits ride across),
-`git add -- <paths>` (explicit paths; untracked files need it, `commit -am`
-skips them), commit, `git checkout main` — then enter at step 3 with
-`coord/<topic>` as <lane>. Everything downstream is identical: battery, pin,
-staged merge, watch, record. Two deltas only: step 3 has no worktree to run in,
-so when the target has moved it is `git checkout coord/<topic>`, merge,
-`git checkout main`; and step 9's retire is the branch delete alone (no agent,
-no worktree), from a clean primary checkout — a `git branch -d` refusing as
-unmerged is a real finding, never forced. Branch BEFORE staging any merge: one
-landing at a time holds here too. In-flight lane work — conflict resolutions,
-update-merges on a lane branch — is NOT a self-lane; it already reaches the
-human inside that lane's staged merge.
+**Changes the coordinator authored itself land the same way — as a SELF-LANE**;
+there is no second review path. Branch the primary checkout's edits before
+staging anything: `git checkout -b coord/<topic>` (uncommitted edits ride
+across), `git add -- <paths>` (untracked files need it; `commit -am` skips
+them), commit, `git checkout main` — then enter at step 3 with `coord/<topic>`
+as <lane>. Two deltas, everything else identical: step 3 has no worktree, so a
+moved target is `git checkout coord/<topic>`, merge, back to main; and step 9's
+retire is the branch delete alone — `git branch -d` refusing as unmerged is a
+finding, never forced. In-flight lane work (conflict resolutions, update-merges)
+is NOT a self-lane: it reaches the human inside that lane's staged merge.
 
 ## Checklist, in order
 
@@ -79,11 +73,11 @@ human inside that lane's staged merge.
    checkout while a merge is staged.
 8. **Present and WATCH.** The staged merge IS the review surface; edits the
    human makes become part of the merge commit they author. Recipe per
-   `LANE_REVIEW`: unset or `vscode` → the bullet below; `manual` → launch
-   NOTHING — the human views the staged merge with their own tool (anything
-   showing staged changes on the primary checkout; `git diff --cached` at
-   minimum; TUIs they run themselves). Unknown value → say so, treat as
-   manual; never guess a launch command. Everything else in this step is
+   `LANE_REVIEW` (settings `env` block, read at session start): unset or
+   `vscode` → the bullet below; `manual` → launch NOTHING, the human views the
+   staged merge with their own tool (anything showing staged changes on the
+   primary checkout; `git diff --cached` at minimum; TUIs they run themselves).
+   Unknown value → say so, treat as manual; never guess a launch command. Everything else in this step is
    identical either way.
    - VS Code: sed `{{REPO}}` (checkout abs path) + `{{LANE}}` (branch) in the
      vendored `land-review.code-workspace.template` into a UNIQUELY-NAMED

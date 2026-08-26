@@ -45,9 +45,6 @@
       }
     ]
   },
-  "enabledPlugins": {
-  },
   "skipWorkflowUsageWarning": true,
-  "theme": "dark",
   "agentPushNotifEnabled": true
 }

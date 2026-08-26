@@ -43,7 +43,12 @@ wrong answers.
   battery).
 - **Report contract**: exit codes actually seen; changes with proofs;
   simplification candidates seen but not done; negative results stated
-  plainly; a committed state-of-play before long operations.
+  plainly; a committed state-of-play before long operations. **CAP the
+  report — verdicts, exit codes, hash/golden lines, and pointers to committed
+  evidence.** Full tables, derivations, and logs go into files on the lane
+  branch (state-of-play, plan sections, log files); the coordinator reads
+  them optionally at skeptical-read time. Say this in every brief — a report
+  that restates its own committed files doubles its output cost.
 
 ## 3. After launch
 

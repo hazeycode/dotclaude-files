@@ -29,13 +29,27 @@ need editing when a project changes.
   FINISHED lanes get killed.** Transcript replay is expensive — lanes commit a
   running state-of-play (measured / ruled out / half-built / next) so a fresh
   lane picks up from disk.
+- **Prune dead worktrees routinely** — at every retire, and sweep whenever the
+  registry grows: a branch fully merged into the target with no tracked
+  modifications loses its worktree and branch; anything else is surfaced,
+  never forced past tracked changes. Every registered worktree becomes a line
+  of fixed context in every future session's environment block, so debris
+  taxes each turn of each session.
 - **BAN UNBOUNDED WAIT-LOOPS IN EVERY BRIEF; bound the retries and exit.** A
   lane polling `until` for what can no longer arrive reports complete yet sits
   registered as running — burning a cap slot, firing a notification per expiry.
   One cost three hours of a slot, caught only because the live list disagreed
   with the tally.
 - **Briefs carry established findings** — never send a lane to re-read a long
-  plan. Extend plans, don't multiply them.
+  plan. Extend plans, don't multiply them. **And never restate what a
+  committed plan, report, or log already records** — in briefs, task
+  descriptions, and reports alike: cite the file (and section) plus only the
+  load-bearing numbers. The owning doc carries the substance, once.
+- **Lane reports are capped: verdicts, exit codes, hash/golden lines, and
+  pointers to committed evidence.** Full tables, derivations, and logs live in
+  files on the lane branch (state-of-play, plan sections, log files), read
+  optionally at skeptical-read time. A report that restates its own committed
+  files pays for the same tokens twice — at frontier output prices.
 - **Ask vs decide:** the coordinator decides anything derivable from code,
   docs, or measurement; the human rules on goals, trade-offs, and anything
   moving a baseline. Rulings are short option quizzes with a recommendation,
@@ -142,5 +156,10 @@ Checks are cheap; churn is not — mistakes, not verification, are the token cos
   inside its own worktree, so relative paths from cwd just work — no need for
   absolute-path friction. Absolute paths only when reaching another tree
   (the coordinator across worktrees; `git -C <path>`).
+- **Batch background work** — every background completion replays the whole
+  context as a fresh turn, so N small background tasks cost N replays. Run
+  short probes foreground in one compound command (per-step exit codes
+  captured); reserve background for genuinely long runs, grouped so
+  completions cluster; never poll for what the harness will notify.
 - **Condense before final commit, without information loss** — responses,
   code, comments, docs, memories; clean stale things as you go.

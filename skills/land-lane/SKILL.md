@@ -1,6 +1,6 @@
 ---
 name: land-lane
-description: Land a finished worker lane — skeptical read, gate battery on the pinned lane tip, stage the merge as the review surface, watch for the human's verdict. The HUMAN authors the landing merge on the target branch (main by default); every exit records findings and ends with the human's retire-or-continue ruling. Use when a background lane reports complete.
+description: Land a finished worker lane — skeptical read, gate battery on the pinned lane tip, stage the merge as the review surface, watch for the human's verdict. The HUMAN authors the landing merge on the target branch (main by default); every exit records findings and ends with the human's retire-or-continue ruling. Use when a background lane reports complete, or when the coordinator has authored changes itself in the primary checkout.
 ---
 
 # Land a lane (human-review flow)
@@ -13,6 +13,21 @@ LANE branches (update-merges, checkpoints); the landing merge on the TARGET is
 the human's, always. Review tool: `LANE_REVIEW` in the settings `env` block
 (read at session start) — unset/`vscode` runs step 8's recipe; `manual` skips
 the launch for the human's own tooling.
+
+**Changes the coordinator authored itself land the same way — as a SELF-LANE.**
+There is no second review path. Turn the primary checkout's edits into a branch
+first: `git checkout -b coord/<topic>` (uncommitted edits ride across),
+`git add -- <paths>` (explicit paths; untracked files need it, `commit -am`
+skips them), commit, `git checkout main` — then enter at step 3 with
+`coord/<topic>` as <lane>. Everything downstream is identical: battery, pin,
+staged merge, watch, record. Two deltas only: step 3 has no worktree to run in,
+so when the target has moved it is `git checkout coord/<topic>`, merge,
+`git checkout main`; and step 9's retire is the branch delete alone (no agent,
+no worktree), from a clean primary checkout — a `git branch -d` refusing as
+unmerged is a real finding, never forced. Branch BEFORE staging any merge: one
+landing at a time holds here too. In-flight lane work — conflict resolutions,
+update-merges on a lane branch — is NOT a self-lane; it already reaches the
+human inside that lane's staged merge.
 
 ## Checklist, in order
 

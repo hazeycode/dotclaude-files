@@ -13,7 +13,9 @@ need editing when a project changes.
 - **Two skills carry the checklists: `spawn-lane`** (model tier, brief, region
   ownership, scoped gates, report contract) **and `land-lane`** (verify, stage
   the merge, then WATCH — **the HUMAN authors the landing merge on main; the
-  coordinator commits only on lane branches**. Every lane, no exceptions).
+  coordinator commits only on lane branches**. Every lane — and every change
+  the coordinator authors itself, which becomes a self-lane branch and lands
+  through the same skill; no exceptions).
   Load the skill at those two moments; don't work from memory of this file.
 - **Cap concurrent lanes (~4)** unless measurement says more. Exclusive
   resources (GPU, benchmarks) get one lane at a time, or a lock. **Count the

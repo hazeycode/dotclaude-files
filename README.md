@@ -28,9 +28,10 @@ staged changes and the agent watches for a merge.
 ## Security
 
 This repo is **public** and installs to `~/.claude/`, where its hooks run
-unsandboxed on every tool call and its skills/CLAUDE.md load as trusted model
-instructions. Review `hooks/`, `templates/settings.json`, the skills, and the workspace
-template with the scrutiny of executable code — a change to any of them is code
-running as you. Keep secrets out of the tracked `templates/settings.json`; machine-local
-config and credentials belong in `settings.local.json` (gitignored).
+unsandboxed on every matched tool call and its skills/CLAUDE.md load as
+trusted model instructions. Review `hooks/`, `templates/settings.json`, the
+skills, and the workspace template with the scrutiny of executable code — a
+change to any of them is code running as you. Keep secrets out of the tracked
+`templates/settings.json`; machine-local config and credentials belong in
+`settings.local.json` (gitignored).
 

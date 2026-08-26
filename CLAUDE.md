@@ -100,11 +100,8 @@ Checks are cheap; churn is not — mistakes, not verification, are the token cos
 - **Prove the problem before building the fix** — a suite that verifies a
   mechanism says nothing about whether the mechanism was needed. Measure the
   friction, or reproduce the failure, before writing the cure.
-- **Never disable the sandbox to get past a denial.** A blocked path or host is
-  policy, not an obstacle: report it and stop. The only legitimate override is
-  a deliberate test OF the sandbox itself — and a containment probe must never
-  carry one, or its result is void. Four probes in one session read clean
-  because the override was set.
+- **A containment probe must never carry a sandbox override** — its result is
+  void. Four probes in one session read clean because the override was set.
 - **Report what you actually saw.** A negative result that kills a design
   cheaply is the most valuable thing a lane can produce.
 
@@ -125,6 +122,23 @@ Checks are cheap; churn is not — mistakes, not verification, are the token cos
   dead** — a staleness banner makes every reader parse both eras. Grep citing
   sites before cutting; append-only records (ledgers, signed entries) are
   history, not dead — they stay.
+
+## Sandbox and local settings
+
+- **A denial is policy, not an obstacle: report it and stop.** Never disable
+  the sandbox to get past one — the only overrides are a deliberate test OF the
+  sandbox, or an action outside the boundary the human explicitly asked for
+  (installing to `~/.claude`).
+- **Reads stop at the repo; writes stop at the repo and `$TMPDIR`.** A project
+  becomes readable only through its OWN untracked
+  `.claude/settings.local.json` — `{"sandbox":{"filesystem":{"allowRead":["."]}}}`.
+  `.` means the project root in project scope but `~/.claude` in user scope, so
+  the global baseline cannot grant it. "Operation not permitted" on a project's
+  own files means that file is missing.
+- **`skills/`, `hooks/`, `agents/` and `~/.claude` refuse bash writes at every
+  scope** — no config lifts it. Edit them with the file tools, which go through
+  permissions instead; a git operation that rewrites those paths fails with
+  `unable to unlink old`.
 
 ## Git in a multi-lane world
 

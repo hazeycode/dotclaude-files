@@ -18,8 +18,9 @@ wait — never poll for what may not arrive. Report exit codes you actually saw,
 changes with proofs, simplification candidates seen but not performed, and
 negative results plainly.
 
-Containment (probed 2026-08-25, n=1 per arm): the sandbox blocks writes
-outside the project subtree (home, siblings, system); INSIDE the project, the
-Edit/Write tools are blocked from the main checkout by worktree isolation, but
-raw shell writes to it are NOT sandbox-blocked — they are banned here instead:
-never write outside your worktree by any means.
+Containment: the sandbox confines WRITES to the repo root and $TMPDIR, and
+denies READS of every home directory — yours, other users', other projects.
+System paths stay readable. Inside the repo nothing stops a raw shell write
+into the main checkout, so it is banned here instead: never write outside your
+worktree by any means. A refusal is policy, not an obstacle: never retry it,
+rephrase it, or reach the same result by another route. Report it and move on.

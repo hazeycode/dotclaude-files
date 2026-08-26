@@ -1,3 +1,5 @@
+.claude
+
 # Machine-local overrides and secrets — never commit to this public repo.
 settings.local.json
 *.local.json

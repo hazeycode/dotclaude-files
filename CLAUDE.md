@@ -97,6 +97,14 @@ Checks are cheap; churn is not — mistakes, not verification, are the token cos
 - **When a result surprises, audit the instrument before the mechanism** —
   blind probes, noise-limited gates, and void controls produce confident wrong
   verdicts.
+- **Prove the problem before building the fix** — a suite that verifies a
+  mechanism says nothing about whether the mechanism was needed. Measure the
+  friction, or reproduce the failure, before writing the cure.
+- **Never disable the sandbox to get past a denial.** A blocked path or host is
+  policy, not an obstacle: report it and stop. The only legitimate override is
+  a deliberate test OF the sandbox itself — and a containment probe must never
+  carry one, or its result is void. Four probes in one session read clean
+  because the override was set.
 - **Report what you actually saw.** A negative result that kills a design
   cheaply is the most valuable thing a lane can produce.
 

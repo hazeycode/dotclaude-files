@@ -87,8 +87,8 @@ is NOT a self-lane: it reaches the human inside that lane's staged merge.
      even when the folder is open elsewhere (`code -n <folder>` silently
      no-ops there). ONLY the primary checkout goes in the window — the lane
      worktree as folder or terminal cwd biases active-repo resolution and
-     blanks the staged-diff view (hit live 2026-08-25). The template opens
-     the staged multi-diff + Git Graph (`mhutchie.git-graph` required), one
+     blanks the staged-diff view. The template opens the staged
+     multi-diff + Git Graph (`mhutchie.git-graph` required), one
      `${command:}` per task (an undefined return cancels the task's remaining
      resolution). Caveats: `task.allowAutomaticTasks` is APPLICATION-scoped —
      "on" in USER settings once per machine; untrusted workspaces suppress

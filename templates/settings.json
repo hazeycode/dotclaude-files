@@ -17,17 +17,43 @@
       "Bash(git push*)",
       "Bash(git stash)",
       "Bash(git stash pop*)"
+    ],
+    "ask": [
+      "WebFetch",
+      "WebSearch"
     ]
   },
   "sandbox": {
     "enabled": true,
-    "autoAllowBashIfSandboxed": true,
+    "autoAllowBashIfSandboxed": false,
     "filesystem": {
-      "allowWrite": [
+      "denyRead": [
+        "~",
+        "/Users",
+        "/home",
+        "/etc/ssh",
+        "/private/etc/ssh",
+        "/var/db",
+        "/private/var/db",
+        "/var/root",
+        "/Library",
+        "/Library/Keychains"
       ],
       "allowRead": [
-        "~/.claude"
-      ]
+        "/Library/Developer",
+        "~/.gitconfig",
+        "~/.config/git",
+        "~/.claude/settings.json",
+        "~/.claude/skills",
+        "~/.claude/agents",
+        "~/.claude/hooks",
+        "~/.claude/CLAUDE.md"
+      ],
+      "allowWrite": []
+    },
+    "network": {
+      "strictAllowlist": false,
+      "allowedDomains": []
     }
   },
   "hooks": {
@@ -40,6 +66,17 @@
             "command": "~/.claude/hooks/enforce-lane-tier.sh",
             "timeout": 10,
             "statusMessage": "Checking lane tier declaration"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/guard-allowlisted-bash.sh",
+            "timeout": 10,
+            "statusMessage": "Guarding allowlisted bash"
           }
         ]
       }

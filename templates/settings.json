@@ -55,7 +55,7 @@
         "~/.claude/hooks",
         "~/.claude/CLAUDE.md"
       ],
-      "allowWrite": []
+      "allowWrite": ["/tmp/claude"]
     },
     "network": {
       "strictAllowlist": false,

@@ -8,9 +8,9 @@ Run from the project root. This overwrites whatever is already in `~/.claude`:
 cp -R CLAUDE.md skills hooks templates agents ~/.claude/ && chmod +x ~/.claude/hooks/*.sh
 ```
 
-That copies files but changes no settings. Nothing takes effect until you merge
+That copies files but changes no settings. No hooks can take effect until you merge
 `templates/settings.json` into `~/.claude/settings.json` yourself — each of the
-five blocks below covers a different gap, so skipping one leaves that gap open.
+four blocks below covers a different gap, so skipping one leaves that gap open.
 Starting fresh? `cp templates/settings.json ~/.claude/settings.json`.
 
 Landings are reviewed in [VS Code](https://code.visualstudio.com) with

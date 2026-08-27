@@ -1,4 +1,4 @@
-Portable coordinator workflow: global rules, lane skills, hooks, settings.
+Portable coordinator workflow: global rules, lane skills, hooks, settings to keep the user in control and claude in his box.
 
 ## Install
 
@@ -99,9 +99,3 @@ are already allowed:
 `.` means the project root in a project file but `~/.claude` in the user file,
 so the global settings cannot do this for you.
 
-## Working on this repo
-
-Checked out at `~/Projects/.claude`, its `hooks/`, `skills/` and `agents/`
-directories look to the harness like an installed `.claude` config, so it
-write-protects them and git merges fail with `unable to unlink old`. Check the
-repo out under any other name to avoid this.

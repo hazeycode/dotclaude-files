@@ -29,15 +29,17 @@
       "Read(~/.gnupg/**)",
       "Read(~/.claude/.credentials.json)",
       "Read(~/.claude/projects/**/*.jsonl)",
-      "Edit(~/.claude/**)",
       "Bash(git push*)",
       "Bash(git stash)",
       "Bash(git stash pop*)"
     ],
     "ask": [
       "WebFetch",
-      "WebSearch"
-    ]
+      "WebSearch",
+      "Edit(~/.claude/**)"
+    ],
+    "disableAutoMode": "disable",
+    "disableBypassPermissionsMode": "disable"
   },
   "sandbox": {
     "enabled": true,

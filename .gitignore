@@ -1,7 +1,11 @@
-.claude
+# Transient only — .claude is NOT ignored wholesale, because the exemption
+# lists (.claude/sandbox-exempt, .claude/bash-expansion-exempt) and a project
+# .claude/settings.json are meant to be TRACKED and reviewed like any code.
+.claude/worktrees/
+.claude/state/
+.claude/.cc-writes/
 
 # Machine-local overrides and secrets — never commit to this public repo.
-settings.local.json
 *.local.json
 .credentials.json
 .env

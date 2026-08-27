@@ -10,7 +10,7 @@ cp -R CLAUDE.md skills hooks templates agents ~/.claude/ && chmod +x ~/.claude/h
 
 That copies files but changes no settings. Nothing takes effect until you merge
 `templates/settings.json` into `~/.claude/settings.json` yourself — each of the
-four blocks below covers a different gap, so skipping one leaves that gap open.
+five blocks below covers a different gap, so skipping one leaves that gap open.
 Starting fresh? `cp templates/settings.json ~/.claude/settings.json`.
 
 Landings are reviewed in [VS Code](https://code.visualstudio.com) with
@@ -53,28 +53,33 @@ nothing else. Delete it if you would rather have no override at all, and set
 
 The middle two first consult the project's own `.claude/bash-expansion-exempt`
 and `.claude/sandbox-exempt` respectively (tracked, and live the moment you
-clone) plus
-their untracked `.local` twins, which can add, veto or disown entries. Read
+clone) plus their untracked `.local` twins, which can add, veto or disown
+entries. Read
 those lists on any repo you didn't write. Writing a glob for one is a footgun
 in two specific ways — anchor every pattern at the head, and never put `*`
 inside an expansion that has not closed — and each hook header shows the exact
 payload that gets through otherwise.
 
-In [auto mode](https://code.claude.com/docs/en/permission-modes) a classifier
-answers prompts instead of you, so anything this repo turns into a prompt is
-decided without you seeing it. The sandbox is the exception: it denies outright
-and asks nobody — except for declared exemptions, which it honours without
-prompting either.
+Two of those four resolve to a PROMPT rather than a refusal, as does the
+`ask` rule on `~/.claude`, so who answers a prompt is load-bearing. In
+[auto mode](https://code.claude.com/docs/en/permission-modes) a classifier
+answers instead of you, and anything this repo turns into a prompt is then
+decided without you seeing it — which is why `templates/settings.json` sets
+`disableAutoMode` and `disableBypassPermissionsMode`. Merge the settings
+selectively and that is the guarantee you drop. The sandbox is the exception
+either way: it denies outright and asks nobody — except for declared
+exemptions, which it honours without prompting either.
 
 ### Sandbox policy
 
-Four blocks in `templates/settings.json` do the work:
+Five blocks in `templates/settings.json` do the work:
 
 | Block | Covers |
 |---|---|
 | `sandbox.filesystem` | bash and anything it runs |
-| `permissions.deny` | the file tools, which the sandbox does not cover |
+| `permissions.deny` / `ask` | the file tools, which the sandbox does not cover |
 | `sandbox.autoAllowBashIfSandboxed: false` | the switch that makes the rest apply |
+| the two `permissions.disable*` gates | who answers a prompt, and that no session starts elevated |
 | the four `hooks.PreToolUse` entries | the hooks above |
 
 Sandboxing covers Bash commands and their child processes only. The Read and

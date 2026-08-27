@@ -32,7 +32,12 @@ need editing when a project changes.
   modifications loses its worktree and branch; anything else is surfaced,
   never forced past tracked changes. Every registered worktree becomes a line
   of fixed context in every future session's environment block, so debris
-  taxes each turn of each session.
+  taxes each turn of each session. **The last step is the HUMAN's**: `.git`
+  protection is file-scoped, so a sandboxed session writes
+  `.git/worktrees/<name>/` freely but cannot delete `commondir` — after
+  removing the checkout, `git worktree remove` and `prune` both fail
+  `Operation not permitted` and leave `prunable` entries until the human runs
+  `git worktree prune`.
 - **BAN UNBOUNDED WAIT-LOOPS IN EVERY BRIEF; bound the retries and exit.** A
   lane polling `until` for what can no longer arrive reports complete yet sits
   registered as running — burning a cap slot, firing a notification per expiry.

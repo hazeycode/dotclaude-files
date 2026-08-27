@@ -11,6 +11,7 @@ cp -R CLAUDE.md skills hooks templates agents ~/.claude/ && chmod +x ~/.claude/h
 That copies files but changes no settings. No hooks can take effect until you merge
 `templates/settings.json` into `~/.claude/settings.json` yourself — each of the
 blocks covers a different gap, so skipping one leaves that gap open.
+
 Starting fresh? `cp templates/settings.json ~/.claude/settings.json`.
 
 Landings are reviewed in [VS Code](https://code.visualstudio.com) with

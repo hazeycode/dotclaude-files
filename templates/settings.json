@@ -70,7 +70,7 @@
       "allowWrite": ["/tmp/claude"]
     },
     "network": {
-      "strictAllowlist": false,
+      "strictAllowlist": true,
       "allowedDomains": []
     }
   },

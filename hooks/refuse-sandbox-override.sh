@@ -37,9 +37,10 @@
 #
 # Three guards, in order:
 #   - without jq the request cannot be read, so it cannot be allowed;
-#   - a command carrying `;` `&&` `||` `|` backtick `$(` or a newline is refused
-#     before any list is consulted, so a pattern can only ever describe ONE
-#     command and cannot be smuggled past as the head of a chain;
+#   - a command carrying `;` `&&` `||` `|` backtick `$(` `<(` `>(` `${` or a
+#     newline is refused before any list is consulted, so a pattern can only
+#     ever describe ONE command and cannot be smuggled past as the head of a
+#     chain or hide a substitution in its tail;
 #   - the substring test runs before jq is used, so deleting jq cannot silence
 #     the hook. Ordinary calls never mention the flag and exit straight away.
 #
@@ -74,7 +75,7 @@ v=$(jq -r '.tool_input.dangerouslyDisableSandbox // false' <<<"$input" 2>/dev/nu
 cmd=$(jq -r '.tool_input.command // ""' <<<"$input" 2>/dev/null)
 
 case $cmd in
-  *';'*|*'&&'*|*'||'*|*'|'*|*'`'*|*'$('*|*$'\n'*)
+  *';'*|*'&&'*|*'||'*|*'|'*|*'`'*|*'$('*|*'<('*|*'>('*|*'${'*|*$'\n'*)
     deny "sandbox override refused; an exemption covers a single unchained command only" ;;
 esac
 

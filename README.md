@@ -30,50 +30,47 @@ merge either way.
 This repo is public and installs into `~/.claude`, where its hooks run
 unsandboxed and its skills and CLAUDE.md load as trusted instructions. Read
 `hooks/`, `templates/settings.json`, the skills and the workspace template the
-way you would read code you are about to run, because that is what they are.
-Keep secrets out of the tracked `templates/settings.json`.
+way you would read code you are about to run — that is what they are. Keep
+secrets out of every `settings.json` `env` block (the tracked template
+included): the file is sandbox-`allowRead` and `grep`/`head`/`tail` are
+Bash-allowlisted, so an agent reads it unprompted, and `permissions.deny
+Read(...)` binds only the Read tool, not Bash. Put secrets in the environment
+or a file the sandbox cannot read.
 
-Four hooks ship with it; each file's header comment gives the attack it catches
-and the gaps it does not:
+Four hooks ship with it; each file's header gives the attack it catches and the
+gaps it does not — read them:
 
 | Hook | Effect |
 |---|---|
 | `enforce-lane-tier.sh` | denies a lane spawn that names no model |
 | `guard-allowlisted-bash.sh` | prompts when an allowlisted command hides a substitution, an unmatched chain segment, or a write redirection |
 | `refuse-sandbox-override.sh` | denies a Bash call asking to disable the sandbox, bar one named exception |
-| `guard-exemption-writes.sh` | prompts on any write touching an exemption file, so the human grants the exemption rather than a lane |
+| `guard-exemption-writes.sh` | prompts on any write to an exemption file, so the human grants the exemption, not a lane |
 
-The named exception is `skills/land-lane/open-review.sh`, which opens the
-review window — a sandboxed process cannot reach launchd, so that one launch
-has to leave the sandbox. It is exempted as the wrapper and never as `code`,
-because `code` takes flags and a glob's `*` matches spaces, so any wildcarded
-`code` pattern would also permit `--install-extension`. The wrapper takes one
-argument, requires it to be an existing `*.code-workspace` file, and can run
-nothing else. Delete it if you would rather have no override at all, and set
-`"LANE_REVIEW": "manual"`.
+The one sandbox-override exception is the wrapper `skills/land-lane/open-review.sh`
+(opening the review window needs launchd, which the sandbox blocks). It is
+exempted as the wrapper, never as `code` — `code` takes flags and a glob's `*`
+matches spaces, so any wildcarded `code` pattern would also permit
+`--install-extension`; the wrapper accepts one existing `*.code-workspace` file
+and nothing else. Delete it and set `"LANE_REVIEW": "manual"` for no override.
 
-The middle two first consult the project's own `.claude/bash-expansion-exempt`
-and `.claude/sandbox-exempt` respectively (tracked, and live the moment you
-clone) plus their untracked `.local` twins, which can add, veto or disown
-entries. Read
-those lists on any repo you didn't write. Writing a glob for one is a footgun
-in two specific ways — anchor every pattern at the head, and never put `*`
-inside an expansion that has not closed — and each hook header shows the exact
-payload that gets through otherwise.
+The middle two first consult the project's tracked `.claude/bash-expansion-exempt`
+/ `.claude/sandbox-exempt` (live on clone) plus untracked `.local` twins that
+add, veto or disown entries — read those lists on any repo you didn't write.
+Writing a glob is a footgun two ways: anchor every pattern at the head, and
+never put `*` inside an unclosed expansion (each hook header shows the payload
+that escapes otherwise).
 
-Two of those four resolve to a PROMPT rather than a refusal, as does the
-`ask` rule on `~/.claude`, so who answers a prompt is load-bearing. In
-[auto mode](https://code.claude.com/docs/en/permission-modes) a classifier
-answers instead of you, and anything this repo turns into a prompt is then
-decided without you seeing it — which is why `templates/settings.json` sets
-`disableAutoMode` and `disableBypassPermissionsMode`. Merge the settings
-selectively and that is the guarantee you drop. The sandbox is the exception
-either way: it denies outright and asks nobody — except for declared
-exemptions, which it honours without prompting either.
+Two of the four resolve to a PROMPT, as does the `ask` on `~/.claude` — so who
+answers is load-bearing. In [auto mode](https://code.claude.com/docs/en/permission-modes)
+a classifier answers instead of you, which is why `templates/settings.json` sets
+`disableAutoMode` and `disableBypassPermissionsMode`; merge the settings
+selectively and you drop that guarantee. The sandbox is the exception: it denies
+outright and asks nobody, honouring declared exemptions without a prompt either.
 
 ### Sandbox policy
 
-Five blocks in `templates/settings.json` do the work:
+Six settings in `templates/settings.json` do the work:
 
 | Block | Covers |
 |---|---|
@@ -82,15 +79,13 @@ Five blocks in `templates/settings.json` do the work:
 | `sandbox.autoAllowBashIfSandboxed: false` | the switch that makes the rest apply |
 | the two `permissions.disable*` gates | who answers a prompt, and that no session starts elevated |
 | the four `hooks.PreToolUse` entries | the hooks above |
+| `sandbox.network.strictAllowlist: true` | egress denied by default; add hosts to `allowedDomains` |
 
-Sandboxing covers Bash commands and their child processes only. The Read and
-Write tools ignore it, so the `permissions.deny` rules are what stop them, and
-no settings file can undo a deny at any scope. While `autoAllowBashIfSandboxed`
-is `true`, every sandboxed command is approved and nothing prompts at all — set
-it to `false`, or the rest of this is inert.
-
-Each project grants itself read access in one untracked line; writes inside it
-are already allowed:
+Sandboxing covers Bash and its children only; the Read/Write tools ignore it, so
+`permissions.deny` is what stops them and no settings file undoes a deny at any
+scope. `autoAllowBashIfSandboxed` must be `false` or every sandboxed command is
+auto-approved and the rest is inert. Each project grants itself read access in
+one untracked line (writes inside are already allowed):
 
 ```jsonc
 // <project>/.claude/settings.local.json   (gitignored)
@@ -98,5 +93,4 @@ are already allowed:
 ```
 
 `.` means the project root in a project file but `~/.claude` in the user file,
-so the global settings cannot do this for you.
-
+so global settings cannot do this for you.

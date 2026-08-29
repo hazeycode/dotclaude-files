@@ -2,8 +2,9 @@
 # PreToolUse(Agent): every lane spawn must name its model.
 #
 # Applies to spawns with isolation "worktree" or "remote". The model must be
-# given and must be sonnet, opus or fable. Forks are refused because they
-# ignore the model parameter. Other spawns pass through untouched.
+# given and must be sonnet, opus or fable. A fork IN THAT SCOPE is refused
+# because it ignores the model parameter; an unisolated fork is not a lane
+# spawn and passes through, as do all other spawns.
 #
 # Fails closed: no jq, or a payload it cannot parse, denies rather than allows.
 #

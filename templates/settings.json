@@ -1,4 +1,7 @@
 {
+  "env": {
+    "LANE_REVIEW": "vscode"
+  },
   "permissions": {
     "allow": [
       "TaskList",

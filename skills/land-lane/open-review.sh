@@ -22,14 +22,18 @@
 # is not verified here that the `code` CLI honours it as an end-of-flags
 # marker, so nothing rests on that.
 
-[ $# -eq 1 ] || exit 64            # exactly one argument, never a flag list
+# A refusal names the check that failed; the exit codes are unchanged.
+usage='usage: open-review.sh <existing *.code-workspace file>'
+die() { printf 'open-review.sh: %s\n%s\n' "$1" "$usage" >&2; exit "$2"; }
+
+[ $# -eq 1 ] || die "expected exactly 1 argument, got $#" 64   # never a flag list
 
 case $1 in
-  -*)               exit 64 ;;     # never a flag, however it is spelled
-  *.code-workspace) : ;;           # never anything but a workspace file
-  *)                exit 64 ;;
+  -*)               die "argument looks like a flag: $1" 64 ;;  # never a flag, however spelled
+  *.code-workspace) : ;;                                        # never anything but a workspace file
+  *)                die "not a .code-workspace file: $1" 64 ;;
 esac
 
-[ -f "$1" ] || exit 66             # must already exist; creates nothing
+[ -f "$1" ] || die "no such workspace file: $1" 66             # must exist; creates nothing
 
 exec code -n -- "$1"

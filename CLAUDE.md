@@ -11,44 +11,20 @@ need editing when a project changes.
   just write yourself, write — a lane costs a worktree, the project context,
   and a merge.
 - **Two skills carry the checklists: `spawn-lane`** (model tier, brief, region
-  ownership, scoped gates, report contract) **and `land-lane`** (verify, stage
-  the merge, then WATCH — **the HUMAN authors the landing merge on main; the
-  coordinator commits only on lane branches**. Every lane — and every change
-  the coordinator authors itself, which becomes a self-lane branch and lands
-  through the same skill; no exceptions).
-  Load the skill at those two moments; don't work from memory of this file.
-- **Cap concurrent lanes (~4)** unless measurement says more. Exclusive
-  resources (GPU, benchmarks) get one lane at a time, or a lock. **Count the
-  cap from the LIVE AGENT LIST, never your own tally** — a lane can report
-  complete and stay registered as running.
+  ownership, scoped gates, report contract, the concurrency cap, and how lanes
+  are nudged, respawned or killed) **and `land-lane`** (verify, stage the
+  merge, then WATCH — **the HUMAN authors the landing merge on main; the
+  coordinator commits only on lane branches** — then retire and prune). Every
+  lane, and every change the coordinator authors itself, lands through
+  land-lane as a self-lane; no exceptions. **Load the skill at those two
+  moments** — this file deliberately no longer carries their contents, so
+  working from memory of it means working without them.
 - **Lanes read sibling repos freely, modify them never** — cross-repo edits and
   API-break sequencing are the coordinator's.
-- **Dead lanes respawn fresh from a checkpoint; idle lanes get a nudge;
-  FINISHED lanes get killed.** Transcript replay is expensive — lanes commit a
-  running state-of-play (measured / ruled out / half-built / next) so a fresh
-  lane picks up from disk.
-- **Prune dead worktrees routinely** — at every retire, and sweep whenever the
-  registry grows: a branch fully merged into the target with no tracked
-  modifications loses its worktree and branch; anything else is surfaced,
-  never forced past tracked changes. Every registered worktree becomes a line
-  of fixed context in every future session's environment block, so debris
-  taxes each turn of each session. **The last step is the HUMAN's**: `.git`
-  protection is file-scoped, so a sandboxed session writes
-  `.git/worktrees/<name>/` freely but cannot delete `commondir` — after
-  removing the checkout, `git worktree remove` and `prune` both fail
-  `Operation not permitted` and leave `prunable` entries until the human runs
-  `git worktree prune`.
-- **BAN UNBOUNDED WAIT-LOOPS IN EVERY BRIEF; bound the retries and exit.** A
-  lane polling `until` for what can no longer arrive reports complete yet sits
-  registered as running — burning a cap slot, firing a notification per expiry.
-  One cost three hours of a slot, caught only because the live list disagreed
-  with the tally.
-- **Briefs carry established findings** — never send a lane to re-read a long
-  plan; extend plans, don't multiply them. **Never restate what a committed
-  plan, report, or log already records** — in briefs, task descriptions, and
-  reports alike: cite the file and section plus the load-bearing numbers. The
-  owning doc carries the substance once; restating it pays twice, at frontier
-  output prices.
+- **Never restate what a committed plan, report, or log already records** — in
+  briefs, task descriptions, and reports alike: cite the file and section plus
+  the load-bearing numbers. The owning doc carries the substance once;
+  restating it pays twice, at frontier output prices.
 - **Ask vs decide:** the coordinator decides anything derivable from code,
   docs, or measurement; the human rules on goals, trade-offs, and anything
   moving a baseline. Rulings are short option quizzes with a recommendation,
@@ -62,8 +38,8 @@ Checks are cheap; churn is not — mistakes, not verification, are the token cos
 - **Run the check on the tree YOU built**; never quote a literal from a plan,
   doc-comment, or brief when the artifact itself can be read.
 - **Quote the exit codes you actually saw** — never pipe a merge or gate
-  through `tail`/`head` in a `&&` chain; it launders the exit code. Capture
-  `$?` explicitly.
+  through `tail`/`head` in a `&&` chain; it launders the exit code the tool
+  would otherwise report.
 - **Inspect visual A/Bs with your own eyes** — metrics under
   auto-exposure/auto-gain read a defective frame as healthy. Look at both
   images before reporting or shipping.
@@ -140,8 +116,7 @@ Checks are cheap; churn is not — mistakes, not verification, are the token cos
   `cat`: a Bash mention prompts). They are honoured with no prompt at all, so
   adding a line IS the grant: a gate needing `dangerouslyDisableSandbox` or a
   command carrying `$( )` is a REQUEST — report the exact glob, the command,
-  and why nothing weaker works. Never write the line; never hunt a phrasing
-  that slips past a guard.
+  and why nothing weaker works. Never write the line yourself.
 - **Reads stop at the repo; writes stop at the repo and `$TMPDIR`.** A project
   becomes readable only through its OWN untracked
   `.claude/settings.local.json` — `{"sandbox":{"filesystem":{"allowRead":["."]}}}`.
@@ -159,6 +134,18 @@ Checks are cheap; churn is not — mistakes, not verification, are the token cos
   (`CLAUDE.md`, `skills/`, `agents/`, `hooks/`, `settings.json`) are readable
   at all; everything else there, including transcripts and credentials, is
   denied.
+- **Bare commands first; scripts second; exemptions last.** Every `$( )`, `$VAR`,
+  `$?`, or chained `; echo` in a Bash call is a permission prompt on the human's
+  screen, paid per invocation. First choice: reshape the command to carry no
+  expansion at all — literal paths (`/tmp/claude/...` over `$TMPDIR`), no `$?`
+  chains (the tool already reports exit codes), quoted heredoc delimiters.
+  Second: logic that genuinely needs expansion, pipes, or loops becomes a
+  TRACKED script under the project's `tools/`, invoked bare — the complexity
+  moves inside, reviewed once instead of prompted always. Last: a command that
+  must recur verbatim across sessions is a head-anchored
+  `.claude/bash-expansion-exempt` candidate, and a REQUEST like every grant. A
+  guard firing on a legitimate command is information for this ladder, never an
+  obstacle to phrase around.
 
 ## Git in a multi-lane world
 
@@ -178,12 +165,10 @@ Checks are cheap; churn is not — mistakes, not verification, are the token cos
 - **Grep first, then read the part you need** — reads dominate context cost,
   and a big early read is re-paid every turn after.
 - **Never `cd`; work from your persistent cwd** — compound `cd … && …` is the
-  largest single source of tool errors in sandboxed worktrees, and triggers
-  permission prompts. The Bash cwd persists across calls and a lane starts in
-  its own worktree, so relative paths just work; absolute paths only to reach
-  another tree (`git -C <path>`).
+  largest single source of tool errors in sandboxed worktrees. The Bash cwd
+  persists across calls and a lane starts in its own worktree, so relative
+  paths just work; absolute paths only to reach another tree (`git -C <path>`).
 - **Batch background work** — every background completion replays the whole
   context as a fresh turn, so N small background tasks cost N replays. Run
-  short probes foreground in one compound command (per-step exit codes
-  captured); reserve background for genuinely long runs, grouped so
-  completions cluster; never poll for what the harness will notify.
+  short probes foreground; reserve background for genuinely long runs, grouped
+  so completions cluster; never poll for what the harness will notify.

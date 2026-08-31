@@ -39,7 +39,7 @@ and `refuse-sandbox-override` deny (closed), `guard-allowlisted-bash` and
 Run from the repo root:
 
 ```bash
-cp -R CLAUDE.md skills hooks templates agents ~/.claude/ && chmod +x ~/.claude/hooks/*.sh
+cp -R CLAUDE.md skills hooks templates agents ~/.claude/ && chmod +x ~/.claude/hooks/*.sh ~/.claude/skills/land-lane/*.sh
 ```
 
 `cp -R` **merges**: it overwrites file by file and never deletes. A file renamed
@@ -185,4 +185,5 @@ so global settings cannot do this for you.
 | A prompt gets answered without you | auto mode — `disableAutoMode` was not merged, so a classifier answers instead of you |
 | The review window opens empty, or not at all | `mhutchie.git-graph` missing, or `task.allowAutomaticTasks` off in USER settings, or the workspace is untrusted (fails silently) |
 | `code -n` exits 0 and no window appears | a sandboxed child cannot reach launchd. That is why `open-review.sh` exists — the one `dangerouslyDisableSandbox` call in the workflow |
+| An edit to a skill has no effect on a running session | skills inject once per session and never reload — the session keeps the copy from its first load until it restarts. Editing skills is the work in this repo, so this bites often |
 | doctor WARNs that `templates/…` is unreadable | expected when doctor itself runs sandboxed: `~/.claude/templates` is not on the sandbox read list. Nothing loads templates at runtime |

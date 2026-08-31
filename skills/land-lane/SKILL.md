@@ -17,7 +17,9 @@ there is no second review path. Branch the primary checkout's edits before
 staging anything: `git checkout -b coord/<topic>` (uncommitted edits ride
 across), `git add -- <paths>` (untracked files need it; `commit -am` skips
 them), commit, `git checkout main` — then enter at step 3 with `coord/<topic>`
-as <lane>. Two deltas, everything else identical: step 3 has no worktree, so a
+as <lane>. Edits touching `hooks/`, `skills/` or `agents/` survive that
+checkout as modifications on the target: restore them with the file tools,
+never `git` — step 7's protected-paths precheck says why. Two deltas, everything else identical: step 3 has no worktree, so a
 moved target is `git checkout coord/<topic>`, merge, back to main; and step 9's
 retire is the branch delete alone — `git branch -d` refusing as unmerged is a
 finding, never forced. In-flight lane work (conflict resolutions, update-merges)
@@ -28,11 +30,10 @@ is NOT a self-lane: it reaches the human inside that lane's staged merge.
 1. **Read the report skeptically.** Claims must cite evidence the lane produced
    (exit codes seen, files written). A number quoted without its source gets
    re-read, not trusted.
-2. **Report-only short-circuit.** `git diff --quiet <target>...<lane>` — quote and
-   map the exit code: **0** = findings only, nothing to review: do step 9's
-   recording duties, then its retire-or-continue question (same rules). **1** =
-   changes exist: continue. **≥128** = the probe itself failed (bad branch, no
-   merge base): stop and investigate — a failed probe is never "continue".
+2. **Report-only short-circuit.** `git diff --quiet <target>...<lane>`: **1** =
+   changes exist, continue. **0** = findings only, nothing to review — go
+   straight to step 9. **≥128** = the probe itself failed (bad branch, no merge
+   base): investigate; a failed probe is never "continue".
 3. **Update the lane branch from the target**: merge <target> INTO the lane, in its
    worktree, exit code quoted — an in-scope coordinator commit on the lane
    branch. Conflicts go to the human unresolved, never quietly fixed; after
@@ -53,15 +54,20 @@ is NOT a self-lane: it reaches the human inside that lane's staged merge.
 6. **Visuals**: if pixels can move, re-capture the standard poses and LOOK at
    before/after yourself before presenting; rotate baselines only after your
    own eyes pass them.
-7. **Stage the merge** (coordinator stages; only the human commits on the
-   target). Prechecks, each exit code quoted:
+7. **Stage the merge.** Prechecks, each exit code quoted:
    - checkout on <target> (`git branch --show-current`) and CLEAN
      (`git status --porcelain` empty) — else stop and surface; stray
      record-edits never ride into the human's merge commit;
    - freshness: `git merge-base --is-ancestor <target> <lane>` exit 0 — else
      the target moved and a clean auto-merge would stage a tree nobody gated:
      back to 3;
-   - tip pin: `git rev-parse <lane>` equals `gated` — else back to 4.
+   - tip pin: `git rev-parse <lane>` equals `gated` — else back to 4;
+   - protected paths: `git diff --name-only <target>...<lane>` naming anything
+     under `hooks/`, `skills/` or `agents/` — the coordinator CANNOT stage this
+     merge. A sandboxed `git` cannot unlink those paths, so `checkout` and
+     `merge` fail `unable to unlink old` PART-WAY, leaving the target dirty.
+     Hand the human the `git merge --no-ff --no-commit <lane>` line, then
+     continue at step 8 once they have staged it.
    Then `git merge --no-ff --no-commit <lane>` (exit code) and record
    `staged_tree=$(git write-tree)` — step 9 diffs against it. If
    `git diff --cached --quiet` exits 0 the merge is EMPTY (the target already
@@ -92,19 +98,19 @@ is NOT a self-lane: it reaches the human inside that lane's staged merge.
      no-ops there). ONLY the primary checkout goes in the window — the lane
      worktree as folder or terminal cwd biases active-repo resolution and
      blanks the staged-diff view. The template opens the staged
-     multi-diff + Git Graph (`mhutchie.git-graph` required), one
-     `${command:}` per task (an undefined return cancels the task's remaining
-     resolution). Caveats: `task.allowAutomaticTasks` is APPLICATION-scoped —
-     "on" in USER settings once per machine; untrusted workspaces suppress
-     folderOpen silently. Delete the instantiated file at cleanup. Exit codes
-     prove dispatch, not display — only the human's eyes confirm the view.
+     multi-diff + Git Graph, one `${command:}` per task (an undefined return
+     cancels the task's remaining resolution). A window that opens empty or
+     not at all is machine setup, not this step — the README lists what to
+     check. Delete the instantiated file at cleanup; exit codes prove
+     dispatch, not display, so only the human's eyes confirm the view.
    Tell the human: branch, target, the lane's commits
    (`git log --oneline <target>..<lane>`), cumulative diffstat
    (`git diff --stat <target>...<lane>`), battery verdict with exit codes,
    report digest, and any `sandbox-exempt` / `bash-expansion-exempt` line in
    the diff quoted VERBATIM — an exemption is a permission grant and never
-   rides in as a diffstat number. Then run the vendored
-   `watch-merge.sh <repo> <lane> <target>` in the background — BOUNDED (1 h default), PRINTS `ACCEPTED <sha>` / `REJECTED` /
+   rides in as a diffstat number. Then run
+   `bash ~/.claude/skills/land-lane/watch-merge.sh <repo> <lane> <target>`
+   in the background — BOUNDED (1 h default), PRINTS `ACCEPTED <sha>` / `REJECTED` /
    `TIMEOUT` the moment MERGE_HEAD resolves. ACCEPTED or REJECTED → step 9
    (the watch is a trigger, not proof). TIMEOUT → ask the human; never re-arm
    silently. "Changes requested" arrives as words, at any point.
@@ -115,6 +121,12 @@ is NOT a self-lane: it reaches the human inside that lane's staged merge.
    anything uncommitted goes to the human, never `--force` unasked) or
    continue (branch and worktree stay; the lane takes its next brief; its
    next land re-enters at 3). Never retire unasked.
+   **Prune at every retire, and sweep when the registry grows** — a branch
+   fully merged with no tracked modifications loses its worktree and branch;
+   anything else is surfaced, never forced. Each registered worktree is fixed
+   context in every future session. **The last step is the HUMAN's**: a
+   sandboxed session cannot delete `commondir`, so `git worktree remove` and
+   `prune` fail `Operation not permitted`, leaving `prunable` entries for them.
    - *Accepted*: verify the human's merge commit on the target (`git log`,
      your own eyes) before recording anything.
    - *Rejected / Changes requested* — preserve review edits BEFORE aborting:

@@ -40,7 +40,10 @@ wrong answers.
   lists don't already cover goes in the report as glob + command + why nothing
   weaker works. The lane never writes the line (`agents/lane.md` carries it).
 - **Established findings** as facts with numbers — never "read the plan".
-  Extend plans, don't send lanes to re-derive them.
+  Extend plans, don't multiply them; never send a lane to re-read a long one.
+- **No unbounded wait-loops — say it in the brief**: bound every retry, then
+  exit. A lane polling for what can no longer arrive reports complete yet stays
+  registered, burning a cap slot; one cost three hours of one.
 - **Region ownership**: the files/regions other live lanes own; the lane stops
   and reports rather than edit those.
 - **Scoped gates** picked from the lane's diff surface, marked "this is your
@@ -55,8 +58,14 @@ wrong answers.
   them optionally at skeptical-read time. Say this in every brief — a report
   that restates its own committed files doubles its output cost.
 
-## 3. After launch
+## 3. Concurrency and lifecycle
 
-Record the lane in your task list with its scope; do not touch its files. When
-it reports complete, load land-lane and follow it — the coordinator verifies
-and stages; the HUMAN authors the landing merge.
+- **Cap concurrent lanes (~4)** unless measurement says more; exclusive
+  resources (GPU, benchmarks) get one at a time, or a lock. **Count from the
+  LIVE AGENT LIST, never your own tally** — a lane can report complete and
+  stay registered.
+- Record each lane with its scope; never touch its files. **Dead lanes respawn
+  from a checkpoint, idle get a nudge, FINISHED get killed** — replay is
+  expensive, so a lane commits a state-of-play and a fresh one resumes from it.
+- On complete: load land-lane. The coordinator verifies and stages; the HUMAN
+  authors the merge.

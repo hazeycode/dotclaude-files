@@ -160,7 +160,7 @@ has_write_redirect() {
         case $tok in
           '&'[0-9]*) ;;                  # 2>&1: a dup, not a write
           /dev/null*) ;;
-          *) return 0 ;;
+          *) redirect_target=${tok%%[[:space:]]*}; return 0 ;;
         esac ;;
     esac
     i=$((i+1))
@@ -177,6 +177,7 @@ has_write_redirect() {
 # on the match it already made.
 segments_all_allowed() {
   local seg p ok
+  offending_segment=''
   while IFS= read -r seg; do
     seg=${seg#"${seg%%[![:space:]]*}"}
     seg=${seg%"${seg##*[![:space:]]}"}
@@ -186,7 +187,7 @@ segments_all_allowed() {
       [ -n "$p" ] || continue
       case $seg in $p) ok=1; break ;; esac
     done <<<"$pats"
-    [ -n "$ok" ] || return 1
+    [ -n "$ok" ] || { offending_segment=$seg; return 1; }
   done <<<"$(split_segments "$cmd")"
   return 0
 }
@@ -208,8 +209,8 @@ case $cmd in
   *'${'*)        reason="\${...} expansion in a pattern-matched command" ;;
 esac
 if [ -z "$reason" ]; then    # no expansion syntax: chain and redirect checks remain
-  segments_all_allowed || ask "a chain or pipe segment that no allow pattern covers"
-  has_write_redirect "$cmd" && ask "a pattern-matched command redirecting output to a file"
+  segments_all_allowed || ask "a chain or pipe segment that no allow pattern covers: \`${offending_segment:0:120}\`"
+  has_write_redirect "$cmd" && ask "a pattern-matched command redirecting output to \`${redirect_target:0:120}\`"
   silent
 fi
 

@@ -1,0 +1,17 @@
+{
+  "sandbox": {
+    "filesystem": {
+      "allowRead": ["./**"],
+      "allowWrite": ["./**"]
+    }
+  },
+  "permissions": {
+    "allow": [
+      "Bash(git add *)",
+      "Bash(git write-tree)",
+      "Bash(git check-ignore *)",
+      "Bash(git worktree prune)",
+      "Bash(git rev-parse *)"
+    ]
+  }
+}

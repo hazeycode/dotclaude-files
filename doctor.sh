@@ -82,7 +82,7 @@ skills/land-lane/land-review.code-workspace.template"
 
 TEMPLATE_FILES="templates/settings.json
 templates/starter-CLAUDE.md
-templates/project-settings-local.json"
+templates/settings.local.json"
 
 compare() { # compare <repo-relative-path> <ok|warn-on-trouble>
   local rel=$1 sev=$2 rc

@@ -5,8 +5,7 @@
 .claude/state/
 .claude/.cc-writes/
 
-# Machine-local overrides and secrets — never commit to this public repo.
-*.local.json
+# Machine-local secrets — never commit to this public repo.
 .credentials.json
 .env
 *.pem

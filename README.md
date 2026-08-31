@@ -72,7 +72,7 @@ agent gets "Operation not permitted" on the project's own files:
 
 ```bash
 mkdir -p <project>/.claude
-cp templates/project-settings-local.json <project>/.claude/settings.local.json
+cp templates/settings.local.json <project>/.claude/settings.local.json
 ```
 
 `.` means the project root in a project file but `~/.claude` in the user file, so

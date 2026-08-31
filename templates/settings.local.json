@@ -1,0 +1,15 @@
+{
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": false,
+    "filesystem": {
+      "allowRead": [
+        "./**"
+      ],
+      "allowWrite": [
+        "./**"
+      ]
+    },
+    "allowUnsandboxedCommands": true
+  }
+}
